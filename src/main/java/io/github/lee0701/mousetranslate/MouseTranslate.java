@@ -35,6 +35,7 @@ public final class MouseTranslate extends JavaPlugin {
 
         reload();
 
+        getCommand("mousetranslate").setExecutor(new CommandHandler());
         Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
 
     }
