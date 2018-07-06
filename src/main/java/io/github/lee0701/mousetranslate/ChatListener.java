@@ -11,21 +11,16 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                MousePlayer mousePlayer = MousePlayer.of(event.getPlayer());
-                if(mousePlayer != null) {
-                    mousePlayer.setChatFormat(event.getFormat());
-                    mousePlayer.setNickname(event.getPlayer().getDisplayName());
-                }
+        MousePlayer mousePlayer = MousePlayer.of(event.getPlayer());
+        if(mousePlayer != null) {
+            mousePlayer.setChatFormat(event.getFormat());
+            mousePlayer.setNickname(event.getPlayer().getDisplayName());
+        }
 
-                String nickname = event.getPlayer().getName();
-                String message = event.getMessage();
-                RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
-                MouseTranslate.getInstance().sendTranslatedMessages("[Minecraft] " + nickname, ratPlayer.getLocale(), message);
-            }
-        }.runTaskAsynchronously(MouseTranslate.getInstance());
+        String nickname = event.getPlayer().getName();
+        String message = event.getMessage();
+        RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
+        MouseTranslate.getInstance().sendTranslatedMessages("[Minecraft] " + nickname, ratPlayer.getLocale(), message);
     }
 
 }

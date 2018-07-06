@@ -32,6 +32,8 @@ public final class MouseTranslate extends JavaPlugin {
     private List<String> languages = new ArrayList<>();
     private String botName;
 
+    private DiscordMessageHandler discordMessageHandler;
+
     private final File dataFile = new File(getDataFolder(), "data.yml");
     private YamlConfiguration dataConfiguration;
 
@@ -65,6 +67,10 @@ public final class MouseTranslate extends JavaPlugin {
                         .setToken(botToken)
                         .buildAsync();
                 jda.addEventListener(new DiscordChatListener());
+
+                discordMessageHandler = new DiscordMessageHandler();
+                discordMessageHandler.runTaskAsynchronously(this);
+
             } catch(LoginException ex) {
                 getLogger().warning("Error loading Discord bot.");
                 ex.printStackTrace();
@@ -96,10 +102,7 @@ public final class MouseTranslate extends JavaPlugin {
     }
 
     public void sendDiscordMessage(TextChannel textChannel, String nickname, String message) {
-        Guild guild = textChannel.getGuild();
-        guild.getController().setNickname(guild.getSelfMember(), nickname).complete();
-        textChannel.sendMessage(message).complete();
-        guild.getController().setNickname(guild.getSelfMember(), botName).complete();
+        discordMessageHandler.offerMessage(new DiscordMessage(textChannel, nickname, message));
     }
 
     public void sendTranslatedMessage(TextChannel textChannel, String nickname, Locale fromLocale, String message) {
