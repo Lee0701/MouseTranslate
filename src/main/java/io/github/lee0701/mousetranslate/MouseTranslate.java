@@ -65,7 +65,6 @@ public final class MouseTranslate extends JavaPlugin {
                         .setToken(botToken)
                         .buildAsync();
                 jda.addEventListener(new DiscordChatListener());
-                botName = jda.getGuildById(serverId).getSelfMember().getEffectiveName();
             } catch(LoginException ex) {
                 getLogger().warning("Error loading Discord bot.");
                 ex.printStackTrace();

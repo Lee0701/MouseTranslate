@@ -38,6 +38,10 @@ public class DiscordChatListener extends ListenerAdapter {
             if(!guild.getId().equals(MouseTranslate.getInstance().getServerId())) return;
             if(member.equals(guild.getSelfMember())) return;
 
+            if(MouseTranslate.getInstance().getBotName() == null) {
+                MouseTranslate.getInstance().setBotName(guild.getSelfMember().getEffectiveName());
+            }
+
             if(MousePlayer.REGISTER_MAP.containsKey(msg)) {
                 Player player = MousePlayer.REGISTER_MAP.get(msg);
 
@@ -69,9 +73,10 @@ public class DiscordChatListener extends ListenerAdapter {
                 }
             }
 
-            Bukkit.getLogger().info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
-
             if(MouseTranslate.getInstance().getChannels().contains(textChannel.getId())) {
+
+                Bukkit.getLogger().info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
+
                 broadcastTranslatedChat(format, minecraftName, msg);
                 message.delete().queue();
                 MouseTranslate.getInstance().sendTranslatedMessage(textChannel, name, null, msg);
