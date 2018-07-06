@@ -10,9 +10,12 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,10 @@ public final class MouseTranslate extends JavaPlugin {
     private String serverId;
     private List<String> channels = new ArrayList<>();
     private List<String> languages = new ArrayList<>();
+    private String botName;
+
+    private final File dataFile = new File(getDataFolder(), "data.yml");
+    private YamlConfiguration dataConfiguration;
 
     @Override
     public void onEnable() {
@@ -43,6 +50,9 @@ public final class MouseTranslate extends JavaPlugin {
     public void reload() {
         reloadConfig();
 
+        channels.clear();
+        languages.clear();
+
         FileConfiguration config = getConfig();
         botToken = config.getString("bot-token");
         serverId = config.getString("server");
@@ -55,6 +65,7 @@ public final class MouseTranslate extends JavaPlugin {
                         .setToken(botToken)
                         .buildAsync();
                 jda.addEventListener(new DiscordChatListener());
+                botName = jda.getGuildById(serverId).getSelfMember().getEffectiveName();
             } catch(LoginException ex) {
                 getLogger().warning("Error loading Discord bot.");
                 ex.printStackTrace();
@@ -63,16 +74,30 @@ public final class MouseTranslate extends JavaPlugin {
             getLogger().warning("Discord bot token is not set. Disabling Discord bot.");
         }
 
+        MousePlayer.PLAYER_MAP.clear();
+        dataConfiguration = YamlConfiguration.loadConfiguration(dataFile);
+        if(dataConfiguration.isList("players")) {
+            dataConfiguration.getList("players");
+        }
+
+    }
+
+    public void save() {
+        dataConfiguration.set("players", new ArrayList<>(MousePlayer.PLAYER_MAP.values()));
+        try {
+            dataConfiguration.save(dataFile);
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        save();
     }
 
     public void sendDiscordMessage(TextChannel textChannel, String nickname, String message) {
         Guild guild = textChannel.getGuild();
-        String botName = guild.getSelfMember().getEffectiveName();
         guild.getController().setNickname(guild.getSelfMember(), nickname).complete();
         textChannel.sendMessage(message).complete();
         guild.getController().setNickname(guild.getSelfMember(), botName).complete();
@@ -113,5 +138,13 @@ public final class MouseTranslate extends JavaPlugin {
 
     public List<String> getLanguages() {
         return languages;
+    }
+
+    public String getBotName() {
+        return botName;
+    }
+
+    public void setBotName(String botName) {
+        this.botName = botName;
     }
 }

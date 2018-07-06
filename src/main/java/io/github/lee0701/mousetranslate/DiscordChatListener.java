@@ -38,14 +38,41 @@ public class DiscordChatListener extends ListenerAdapter {
             if(!guild.getId().equals(MouseTranslate.getInstance().getServerId())) return;
             if(member.equals(guild.getSelfMember())) return;
 
+            if(MousePlayer.REGISTER_MAP.containsKey(msg)) {
+                Player player = MousePlayer.REGISTER_MAP.get(msg);
+
+                MousePlayer mousePlayer = MousePlayer.of(author.getId());
+                mousePlayer.setNickname(player.getDisplayName());
+                mousePlayer.setUuid(player.getUniqueId().toString());
+
+                player.sendMessage("Discord register complete!");
+
+                MousePlayer.REGISTER_MAP.remove(msg);
+                message.delete().queue();
+                return;
+            }
+
             String name;
             if(message.isWebhookMessage()) name = author.getName();
             else name = member.getEffectiveName();
+            String minecraftName = name;
+
+            String format = "[Discord] %s: %s";
+
+            MousePlayer mousePlayer = MousePlayer.of(author.getId());
+            if(mousePlayer.getUuid() != null) {
+                if(mousePlayer.getChatFormat() != null) {
+                    format = "[Discord] " + mousePlayer.getChatFormat();
+                }
+                if(mousePlayer.getNickname() != null) {
+                    minecraftName = mousePlayer.getNickname();
+                }
+            }
 
             Bukkit.getLogger().info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
 
             if(MouseTranslate.getInstance().getChannels().contains(textChannel.getId())) {
-                broadcastTranslatedChat(name, msg);
+                broadcastTranslatedChat(format, minecraftName, msg);
                 message.delete().queue();
                 MouseTranslate.getInstance().sendTranslatedMessage(textChannel, name, null, msg);
             }
@@ -53,7 +80,7 @@ public class DiscordChatListener extends ListenerAdapter {
         }
     }
 
-    public void broadcastTranslatedChat(String username, String message) {
+    public void broadcastTranslatedChat(String format, String username, String message) {
         Set<RatPlayer> recipients = new HashSet<>();
         for (Player bukkitPlayer: Bukkit.getServer().getOnlinePlayers()) {
             recipients.add(RatPlayer.of(bukkitPlayer));
@@ -61,8 +88,6 @@ public class DiscordChatListener extends ListenerAdapter {
 
         LangStorage langStorage = RatTranslate.getInstance().getLangStorage();
         Translator translator = RatTranslate.getInstance().getTranslator();
-
-        String format = "[Discord] %s: %s";
 
         String originalMessage = String.format(format, username, message);
         Collector<Locale, ?, Map<Locale, String>> collector = Collectors.toMap(locale -> locale,
