@@ -20,15 +20,11 @@ import java.util.stream.Collectors;
 public class DiscordChatListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        JDA jda = event.getJDA();
 
         User author = event.getAuthor();
         Message message = event.getMessage();
-        MessageChannel channel = event.getChannel();
 
         String msg = message.getContentDisplay();
-
-        boolean bot = author.isBot();
 
         if(event.isFromType(ChannelType.TEXT)) {
             Guild guild = event.getGuild();

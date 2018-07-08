@@ -26,7 +26,6 @@ public final class MouseTranslate extends JavaPlugin {
     }
 
     private JDA jda;
-    private String botToken;
     private String serverId;
     private List<String> channels = new ArrayList<>();
     private List<String> languages = new ArrayList<>();
@@ -56,13 +55,14 @@ public final class MouseTranslate extends JavaPlugin {
         languages.clear();
 
         FileConfiguration config = getConfig();
-        botToken = config.getString("bot-token");
+        String botToken = config.getString("bot-token");
         serverId = config.getString("server");
         channels = config.getStringList("channels");
         languages = config.getStringList("languages");
 
         if(botToken != null) {
             try {
+                if(jda != null) jda.shutdown();
                 jda = new JDABuilder(AccountType.BOT)
                         .setToken(botToken)
                         .buildAsync();
