@@ -112,19 +112,7 @@ public final class MouseTranslate extends JavaPlugin {
     }
 
     public void sendTranslatedMessage(TextChannel textChannel, String nickname, Locale fromLocale, String message) {
-        StringBuilder translatedMessage = new StringBuilder();
-        Translator translator = RatTranslate.getInstance().getTranslator();
-        boolean auto = true;
-        translatedMessage.append(nickname);
-        translatedMessage.append(":\n");
-        for(String locale : languages) {
-            Locale toLocale = Locale.getByCode(locale);
-            translatedMessage.append(auto ? translator.translateAuto(message, toLocale) : translator.translate(message, fromLocale, toLocale));
-            translatedMessage.append('\n');
-        }
-        translatedMessage.deleteCharAt(translatedMessage.lastIndexOf("\n"));
-
-        sendDiscordMessage(textChannel, nickname, translatedMessage.toString());
+        discordMessageHandler.offerMessage(new TranslatingDiscordMessage(textChannel, nickname, fromLocale, message));
     }
 
     public void sendTranslatedMessages(String nickname, Locale fromLocale, String message) {
