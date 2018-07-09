@@ -57,7 +57,7 @@ public class DiscordChatListener extends ListenerAdapter {
             else name = member.getEffectiveName();
             String minecraftName = name;
 
-            String format = "[Discord] %s: %s";
+            String format = "[Discord] <%s> %s";
 
             MousePlayer mousePlayer = MousePlayer.of(author.getId());
             if(mousePlayer.getUuid() != null) {
