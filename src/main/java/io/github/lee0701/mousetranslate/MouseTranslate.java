@@ -115,6 +115,8 @@ public final class MouseTranslate extends JavaPlugin {
         StringBuilder translatedMessage = new StringBuilder();
         Translator translator = RatTranslate.getInstance().getTranslator();
         boolean auto = true;
+        translatedMessage.append(nickname);
+        translatedMessage.append(":\n");
         for(String locale : languages) {
             Locale toLocale = Locale.getByCode(locale);
             translatedMessage.append(auto ? translator.translateAuto(message, toLocale) : translator.translate(message, fromLocale, toLocale));
