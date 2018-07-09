@@ -6,7 +6,6 @@ import io.github.ranolp.rattranslate.translator.Translator;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,7 +43,7 @@ public final class MouseTranslate extends JavaPlugin {
         reload();
 
         getCommand("mousetranslate").setExecutor(new CommandHandler());
-        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EventListener(), this);
 
     }
 
@@ -103,6 +102,13 @@ public final class MouseTranslate extends JavaPlugin {
 
     public void sendDiscordMessage(TextChannel textChannel, String nickname, String message) {
         discordMessageHandler.offerMessage(new DiscordMessage(textChannel, nickname, message));
+    }
+
+    public void sendDiscordMessages(String nickname, String messge) {
+        for(String channelId : channels) {
+            TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
+            sendDiscordMessage(textChannel, nickname, messge);
+        }
     }
 
     public void sendTranslatedMessage(TextChannel textChannel, String nickname, Locale fromLocale, String message) {
