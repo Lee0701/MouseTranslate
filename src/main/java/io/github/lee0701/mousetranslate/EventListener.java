@@ -1,6 +1,7 @@
 package io.github.lee0701.mousetranslate;
 
 import io.github.ranolp.rattranslate.RatPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,7 +21,7 @@ public class EventListener implements Listener {
         }
 
         String nickname = event.getPlayer().getName();
-        String message = event.getMessage();
+        String message = ChatColor.stripColor(event.getMessage());
         RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
         MouseTranslate.getInstance().sendTranslatedMessages("[Minecraft] " + nickname, ratPlayer.getLocale(), message);
     }
