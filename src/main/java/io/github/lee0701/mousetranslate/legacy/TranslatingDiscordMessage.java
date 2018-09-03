@@ -1,4 +1,4 @@
-package io.github.lee0701.mousetranslate;
+package io.github.lee0701.mousetranslate.legacy;
 
 import io.github.ranolp.rattranslate.Locale;
 import net.dv8tion.jda.core.entities.TextChannel;

@@ -19,66 +19,76 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class DiscordChatListener extends ListenerAdapter {
+    private final LegacyBotInstance bot = MouseTranslate.getInstance().getBot();
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        if (!event.isFromType(ChannelType.TEXT)) {
+            return;
+        }
 
         User author = event.getAuthor();
         Message message = event.getMessage();
 
         String msg = message.getContentDisplay();
 
-        if (event.isFromType(ChannelType.TEXT)) {
-            Guild guild = event.getGuild();
-            TextChannel textChannel = event.getTextChannel();
-            Member member = event.getMember();
+        Guild guild = event.getGuild();
+        TextChannel textChannel = event.getTextChannel();
+        Member member = event.getMember();
 
-            if (!guild.getId().equals(MouseTranslate.getInstance().getServerId())) { return; }
-            if (member.equals(guild.getSelfMember())) { return; }
+        if (!guild.getId().equals(MouseTranslate.getInstance().getServerId())) {
+            return;
+        }
+        if (member.equals(guild.getSelfMember())) {
+            return;
+        }
 
-            if (MouseTranslate.getInstance().getBotName() == null) {
-                MouseTranslate.getInstance().setBotName(guild.getSelfMember().getEffectiveName());
-            }
+        if (MouseTranslate.getInstance().getBotName() == null) {
+            MouseTranslate.getInstance().setBotName(guild.getSelfMember().getEffectiveName());
+        }
 
-            if (MousePlayer.REGISTER_MAP.containsKey(msg)) {
-                Player player = MousePlayer.REGISTER_MAP.get(msg);
-
-                MousePlayer mousePlayer = MousePlayer.of(author.getId());
-                mousePlayer.setNickname(player.getDisplayName());
-                mousePlayer.setUuid(player.getUniqueId().toString());
-
-                player.sendMessage("Discord register complete!");
-
-                MousePlayer.REGISTER_MAP.remove(msg);
-                message.delete().queue();
-                return;
-            }
-
-            String name;
-            if (message.isWebhookMessage()) { name = author.getName(); } else { name = member.getEffectiveName(); }
-            String minecraftName = name;
-
-            String format = "[Discord] <%s> %s";
+        if (MousePlayer.REGISTER_MAP.containsKey(msg)) {
+            Player player = MousePlayer.REGISTER_MAP.get(msg);
 
             MousePlayer mousePlayer = MousePlayer.of(author.getId());
-            if (mousePlayer.getUuid() != null) {
-                if (mousePlayer.getChatFormat() != null) {
-                    format = "[Discord] " + mousePlayer.getChatFormat();
-                }
-                if (mousePlayer.getNickname() != null) {
-                    minecraftName = mousePlayer.getNickname();
-                }
+            mousePlayer.setNickname(player.getDisplayName());
+            mousePlayer.setUuid(player.getUniqueId().toString());
+
+            player.sendMessage("Discord register complete!");
+
+            MousePlayer.REGISTER_MAP.remove(msg);
+            message.delete().queue();
+            return;
+        }
+
+        String name;
+        if (message.isWebhookMessage()) {
+            name = author.getName();
+        } else {
+            name = member.getEffectiveName();
+        }
+        String minecraftName = name;
+
+        String format = "[Discord] <%s> %s";
+
+        MousePlayer mousePlayer = MousePlayer.of(author.getId());
+        if (mousePlayer.getUuid() != null) {
+            if (mousePlayer.getChatFormat() != null) {
+                format = "[Discord] " + mousePlayer.getChatFormat();
             }
-
-            if (MouseTranslate.getInstance().getChannels().contains(textChannel.getId())) {
-
-                Bukkit.getLogger()
-                        .info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
-
-                broadcastTranslatedChat(format, minecraftName, msg);
-                message.delete().queue();
-                MouseTranslate.getInstance().sendTranslatedMessage(textChannel, name, null, msg);
+            if (mousePlayer.getNickname() != null) {
+                minecraftName = mousePlayer.getNickname();
             }
+        }
 
+        if (MouseTranslate.getInstance().getChannels().contains(textChannel.getId())) {
+
+            Bukkit.getLogger()
+                    .info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
+
+            broadcastTranslatedChat(format, minecraftName, msg);
+            message.delete().queue();
+            bot.sendMinecraftMessage(textChannel, name, null, msg);
         }
     }
 

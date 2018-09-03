@@ -1,31 +1,23 @@
 package io.github.lee0701.mousetranslate;
 
-import io.github.ranolp.rattranslate.Locale;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class MouseTranslate extends JavaPlugin {
-
     private final File dataFile = new File(getDataFolder(), "data.yml");
-    private JDA jda;
+    private LegacyBotInstance bot = new LegacyBotInstance();
     private String serverId;
     private List<String> channels = new ArrayList<>();
     private List<String> languages = new ArrayList<>();
     private String botName;
 
-    private DiscordMessageHandler discordMessageHandler;
     private YamlConfiguration dataConfiguration;
 
     public static MouseTranslate getInstance() {
@@ -34,6 +26,7 @@ public final class MouseTranslate extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        //noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
         saveDefaultConfig();
 
@@ -57,18 +50,7 @@ public final class MouseTranslate extends JavaPlugin {
         languages = config.getStringList("languages");
 
         if (botToken != null) {
-            try {
-                if (jda != null) { jda.shutdown(); }
-                jda = new JDABuilder(AccountType.BOT).setToken(botToken).buildAsync();
-                jda.addEventListener(new DiscordChatListener());
-
-                discordMessageHandler = new DiscordMessageHandler();
-                discordMessageHandler.runTaskAsynchronously(this);
-
-            } catch (LoginException ex) {
-                getLogger().warning("Error loading Discord bot.");
-                ex.printStackTrace();
-            }
+            bot.setToken(botToken);
         } else {
             getLogger().warning("Discord bot token is not set. Disabling Discord bot.");
         }
@@ -95,30 +77,8 @@ public final class MouseTranslate extends JavaPlugin {
         save();
     }
 
-    public void sendDiscordMessage(TextChannel textChannel, String nickname, String message) {
-        discordMessageHandler.offerMessage(new DiscordMessage(textChannel, nickname, message));
-    }
-
-    public void sendDiscordMessages(String nickname, String messge) {
-        for (String channelId : channels) {
-            TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
-            sendDiscordMessage(textChannel, nickname, messge);
-        }
-    }
-
-    public void sendTranslatedMessage(TextChannel textChannel, String nickname, Locale fromLocale, String message) {
-        discordMessageHandler.offerMessage(new TranslatingDiscordMessage(textChannel, nickname, fromLocale, message));
-    }
-
-    public void sendTranslatedMessages(String nickname, Locale fromLocale, String message) {
-        for (String channelId : channels) {
-            TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
-            sendTranslatedMessage(textChannel, nickname, fromLocale, message);
-        }
-    }
-
-    public JDA getJda() {
-        return jda;
+    public LegacyBotInstance getBot() {
+        return bot;
     }
 
     public String getServerId() {

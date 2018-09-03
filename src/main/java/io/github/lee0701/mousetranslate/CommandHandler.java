@@ -11,11 +11,11 @@ public class CommandHandler implements CommandExecutor {
 
     private static String getRandomString(int length) {
         Random random = new Random();
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < length; i++) {
             int num = random.nextInt(26) + 0x41;
             if (random.nextBoolean()) { num += 0x20; }
-            result.append((char) ((int) num));
+            result.append((char) num);
         }
         return result.toString();
     }

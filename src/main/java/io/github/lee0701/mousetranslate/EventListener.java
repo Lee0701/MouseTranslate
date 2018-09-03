@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class EventListener implements Listener {
+    private final LegacyBotInstance bot = MouseTranslate.getInstance().getBot();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
@@ -22,21 +23,21 @@ public class EventListener implements Listener {
         String nickname = event.getPlayer().getName();
         String message = ChatColor.stripColor(event.getMessage());
         RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
-        MouseTranslate.getInstance().sendTranslatedMessages("[Minecraft] " + nickname, ratPlayer.getLocale(), message);
+        bot.sendMinecraftMessage("[Minecraft] " + nickname, ratPlayer.getLocale(), message);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         String name = MouseTranslate.getInstance().getBotName();
         String message = event.getPlayer().getName() + " joined.";
-        MouseTranslate.getInstance().sendDiscordMessages(name, message);
+        bot.sendDiscordMessages(name, message);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         String name = MouseTranslate.getInstance().getBotName();
         String message = event.getPlayer().getName() + " quit.";
-        MouseTranslate.getInstance().sendDiscordMessages(name, message);
+        bot.sendDiscordMessages(name, message);
     }
 
 }
