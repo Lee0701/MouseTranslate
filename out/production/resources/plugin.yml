@@ -1,9 +1,0 @@
-name: MouseTranslate
-version: @version@
-main: io.github.lee0701.mousetranslate.MouseTranslate
-authors: [Lee0701]
-description: Discord & Spigot translate plugin that uses RatTranslate.
-commands:
-  mousetranslate:
-    aliases: [mousetr, mtr]
-    description: "MouseTranslation main command."
