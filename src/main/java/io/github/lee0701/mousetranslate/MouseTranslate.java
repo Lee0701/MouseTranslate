@@ -1,8 +1,6 @@
 package io.github.lee0701.mousetranslate;
 
-import io.github.ranolp.rattranslate.RatTranslate;
 import io.github.ranolp.rattranslate.Locale;
-import io.github.ranolp.rattranslate.translator.Translator;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -20,10 +18,7 @@ import java.util.List;
 
 public final class MouseTranslate extends JavaPlugin {
 
-    public static MouseTranslate getInstance() {
-        return getPlugin(MouseTranslate.class);
-    }
-
+    private final File dataFile = new File(getDataFolder(), "data.yml");
     private JDA jda;
     private String serverId;
     private List<String> channels = new ArrayList<>();
@@ -31,9 +26,11 @@ public final class MouseTranslate extends JavaPlugin {
     private String botName;
 
     private DiscordMessageHandler discordMessageHandler;
-
-    private final File dataFile = new File(getDataFolder(), "data.yml");
     private YamlConfiguration dataConfiguration;
+
+    public static MouseTranslate getInstance() {
+        return getPlugin(MouseTranslate.class);
+    }
 
     @Override
     public void onEnable() {
@@ -59,18 +56,16 @@ public final class MouseTranslate extends JavaPlugin {
         channels = config.getStringList("channels");
         languages = config.getStringList("languages");
 
-        if(botToken != null) {
+        if (botToken != null) {
             try {
-                if(jda != null) jda.shutdown();
-                jda = new JDABuilder(AccountType.BOT)
-                        .setToken(botToken)
-                        .buildAsync();
+                if (jda != null) { jda.shutdown(); }
+                jda = new JDABuilder(AccountType.BOT).setToken(botToken).buildAsync();
                 jda.addEventListener(new DiscordChatListener());
 
                 discordMessageHandler = new DiscordMessageHandler();
                 discordMessageHandler.runTaskAsynchronously(this);
 
-            } catch(LoginException ex) {
+            } catch (LoginException ex) {
                 getLogger().warning("Error loading Discord bot.");
                 ex.printStackTrace();
             }
@@ -80,7 +75,7 @@ public final class MouseTranslate extends JavaPlugin {
 
         MousePlayer.PLAYER_MAP.clear();
         dataConfiguration = YamlConfiguration.loadConfiguration(dataFile);
-        if(dataConfiguration.isList("players")) {
+        if (dataConfiguration.isList("players")) {
             dataConfiguration.getList("players");
         }
 
@@ -90,7 +85,7 @@ public final class MouseTranslate extends JavaPlugin {
         dataConfiguration.set("players", new ArrayList<>(MousePlayer.PLAYER_MAP.values()));
         try {
             dataConfiguration.save(dataFile);
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -105,7 +100,7 @@ public final class MouseTranslate extends JavaPlugin {
     }
 
     public void sendDiscordMessages(String nickname, String messge) {
-        for(String channelId : channels) {
+        for (String channelId : channels) {
             TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
             sendDiscordMessage(textChannel, nickname, messge);
         }
@@ -116,7 +111,7 @@ public final class MouseTranslate extends JavaPlugin {
     }
 
     public void sendTranslatedMessages(String nickname, Locale fromLocale, String message) {
-        for(String channelId : channels) {
+        for (String channelId : channels) {
             TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
             sendTranslatedMessage(textChannel, nickname, fromLocale, message);
         }

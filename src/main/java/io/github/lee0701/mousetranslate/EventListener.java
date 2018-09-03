@@ -8,14 +8,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         MousePlayer mousePlayer = MousePlayer.of(event.getPlayer());
-        if(mousePlayer != null) {
+        if (mousePlayer != null) {
             mousePlayer.setChatFormat(event.getFormat());
             mousePlayer.setNickname(event.getPlayer().getDisplayName());
         }
