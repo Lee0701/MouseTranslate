@@ -63,7 +63,7 @@ public class DiscordChatListener extends ListenerAdapter {
 
         TextChannel textChannel = event.getTextChannel();
 
-        String name = message.isWebhookMessage() ? author.getName() : member.getEffectiveName();
+        String name = member.getEffectiveName();
         String minecraftName = name;
 
         String format = "[Discord] <%s> %s";
@@ -82,7 +82,8 @@ public class DiscordChatListener extends ListenerAdapter {
             Bukkit.getLogger()
                     .info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
             broadcastTranslatedChat(format, minecraftName, msg);
-            bot.sendDiscordMessage(new MinecraftMessage("Discord", textChannel, name, msg, null));
+            bot.sendDiscordMessage(
+                    new MinecraftMessage("Discord", textChannel, name, msg, null, IconStorage.getIconFor(author)));
             message.delete().queue();
         }
     }
@@ -102,19 +103,15 @@ public class DiscordChatListener extends ListenerAdapter {
         Map<Locale, String> translateMap = recipients.stream()
                 .map(RatPlayer::getLocale)
                 .distinct()
-                .collect(Collectors.toMap(
-                        locale -> locale,
+                .collect(Collectors.toMap(locale -> locale,
                         locale -> String.format(format, username, translator.translateAuto(message, locale))
                 ));
         for (RatPlayer recipient : recipients) {
             if (recipient.getTranslateMode()) {
                 String translated = translateMap.get(recipient.getLocale());
                 if (RatTranslate.getInstance().isJsonMessageAvailable()) {
-                    String hover = recipient.format(
-                            langStorage,
-                            "chat.original",
-                            Variable.ofAny("hover", "text", message),
-                            Variable.ofAny("hover", "lang", "auto")
+                    String hover = recipient.format(langStorage, "chat.original",
+                            Variable.ofAny("hover", "text", message), Variable.ofAny("hover", "lang", "auto")
                     );
                     recipient.sendHoverableMessage(translated, hover);
                 } else {

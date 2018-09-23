@@ -5,6 +5,7 @@ import io.github.ranolp.rattranslate.Locale;
 import io.github.ranolp.rattranslate.RatTranslate;
 import io.github.ranolp.rattranslate.translator.Translator;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Icon;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.EnumMap;
@@ -113,7 +114,8 @@ public class MinecraftMessage extends WebhookMessage {
         DISCORD_PREFIXES.put(Locale.TRADITIONAL_CHINESE, ":flag_tw:");
     }
 
-    public MinecraftMessage(String side, TextChannel channel, String nickname, String message, Locale fromLocale) {
+    public MinecraftMessage(String side, TextChannel channel, String nickname, String message, Locale fromLocale,
+            Icon icon) {
         super(channel, nickname);
 
         Translator translator = RatTranslate.getInstance().getTranslator();
@@ -134,6 +136,7 @@ public class MinecraftMessage extends WebhookMessage {
                     return translated;
                 })
                 .collect(Collectors.joining("\n"));
+        setAvatar(icon);
         setMessage(new MessageBuilder().setContent("[" + side + "]\n" + translatedMessage).build());
     }
 }

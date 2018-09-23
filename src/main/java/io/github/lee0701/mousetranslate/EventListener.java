@@ -26,13 +26,10 @@ public class EventListener implements Listener {
         String nickname = event.getPlayer().getName();
         String message = ChatColor.stripColor(event.getMessage());
         RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
-        bot.sendDiscordMessages(channel -> new MinecraftMessage(
-                "Minecraft",
-                channel,
-                nickname,
-                message,
-                ratPlayer.getLocale()
-        ));
+        bot.sendDiscordMessages(
+                channel -> new MinecraftMessage("Minecraft", channel, nickname, message, ratPlayer.getLocale(),
+                        IconStorage.getIconFor(event.getPlayer().getUniqueId())
+                ));
     }
 
     @EventHandler
