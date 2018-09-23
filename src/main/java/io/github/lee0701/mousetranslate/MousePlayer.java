@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class MousePlayer implements ConfigurationSerializable {
     static final Map<String, MousePlayer> PLAYER_MAP = new HashMap<>();
@@ -20,13 +21,12 @@ public class MousePlayer implements ConfigurationSerializable {
         this.discordId = discordId;
     }
 
-    public static MousePlayer of(Player player) {
+    public static Optional<MousePlayer> of(Player player) {
         Objects.requireNonNull(player, "player");
         return PLAYER_MAP.values()
                 .stream()
                 .filter(e -> player.getUniqueId().toString().equals(e.uuid))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     public static MousePlayer of(String discordId) {

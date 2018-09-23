@@ -1,5 +1,6 @@
 package io.github.lee0701.mousetranslate;
 
+import io.github.lee0701.mousetranslate.message.MinecraftMessage;
 import io.github.ranolp.rattranslate.Locale;
 import io.github.ranolp.rattranslate.RatPlayer;
 import io.github.ranolp.rattranslate.RatTranslate;
@@ -12,14 +13,12 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class DiscordChatListener extends ListenerAdapter {
-    private final LegacyBotInstance bot = MouseTranslate.getInstance().getBot();
+    private final BotInstance bot = MouseTranslate.getInstance().getBot();
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -27,25 +26,26 @@ public class DiscordChatListener extends ListenerAdapter {
             return;
         }
 
-        User author = event.getAuthor();
-        Message message = event.getMessage();
-
-        String msg = message.getContentDisplay();
-
         Guild guild = event.getGuild();
-        TextChannel textChannel = event.getTextChannel();
-        Member member = event.getMember();
 
         if (!guild.getId().equals(MouseTranslate.getInstance().getServerId())) {
             return;
         }
-        if (member.equals(guild.getSelfMember())) {
+
+        Member member = event.getMember();
+
+        if (guild.getSelfMember().equals(member)) {
             return;
         }
 
-        if (MouseTranslate.getInstance().getBotName() == null) {
-            MouseTranslate.getInstance().setBotName(guild.getSelfMember().getEffectiveName());
+        Message message = event.getMessage();
+
+        if (message.isWebhookMessage()) {
+            return;
         }
+
+        User author = event.getAuthor();
+        String msg = message.getContentDisplay();
 
         if (MousePlayer.REGISTER_MAP.containsKey(msg)) {
             Player player = MousePlayer.REGISTER_MAP.get(msg);
@@ -61,12 +61,9 @@ public class DiscordChatListener extends ListenerAdapter {
             return;
         }
 
-        String name;
-        if (message.isWebhookMessage()) {
-            name = author.getName();
-        } else {
-            name = member.getEffectiveName();
-        }
+        TextChannel textChannel = event.getTextChannel();
+
+        String name = message.isWebhookMessage() ? author.getName() : member.getEffectiveName();
         String minecraftName = name;
 
         String format = "[Discord] <%s> %s";
@@ -82,36 +79,39 @@ public class DiscordChatListener extends ListenerAdapter {
         }
 
         if (MouseTranslate.getInstance().getChannels().contains(textChannel.getId())) {
-
             Bukkit.getLogger()
                     .info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
-
             broadcastTranslatedChat(format, minecraftName, msg);
+            bot.sendDiscordMessage(new MinecraftMessage("Discord", textChannel, name, msg, null));
             message.delete().queue();
-            bot.sendMinecraftMessage(textChannel, name, null, msg);
         }
     }
 
-    public void broadcastTranslatedChat(String format, String username, String message) {
-        Set<RatPlayer> recipients = new HashSet<>();
-        for (Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers()) {
-            recipients.add(RatPlayer.of(bukkitPlayer));
-        }
+    private void broadcastTranslatedChat(String format, String username, String message) {
+        Set<RatPlayer> recipients = Bukkit.getServer()
+                .getOnlinePlayers()
+                .stream()
+                .map(RatPlayer::of)
+                .collect(Collectors.toSet());
 
         LangStorage langStorage = RatTranslate.getInstance().getLangStorage();
         Translator translator = RatTranslate.getInstance().getTranslator();
 
         String originalMessage = String.format(format, username, message);
-        Collector<Locale, ?, Map<Locale, String>> collector = Collectors.toMap(locale -> locale,
-                locale -> String.format(format, username, translator.translateAuto(message, locale))
-        );
 
-        Map<Locale, String> translateMap = recipients.stream().map(RatPlayer::getLocale).distinct().collect(collector);
+        Map<Locale, String> translateMap = recipients.stream()
+                .map(RatPlayer::getLocale)
+                .distinct()
+                .collect(Collectors.toMap(
+                        locale -> locale,
+                        locale -> String.format(format, username, translator.translateAuto(message, locale))
+                ));
         for (RatPlayer recipient : recipients) {
             if (recipient.getTranslateMode()) {
                 String translated = translateMap.get(recipient.getLocale());
                 if (RatTranslate.getInstance().isJsonMessageAvailable()) {
-                    String hover = recipient.format(langStorage,
+                    String hover = recipient.format(
+                            langStorage,
                             "chat.original",
                             Variable.ofAny("hover", "text", message),
                             Variable.ofAny("hover", "lang", "auto")

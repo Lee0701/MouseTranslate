@@ -1,8 +1,6 @@
 package io.github.lee0701.mousetranslate;
 
-import io.github.lee0701.mousetranslate.legacy.DiscordMessage;
-import io.github.lee0701.mousetranslate.legacy.TranslatingDiscordMessage;
-import io.github.ranolp.rattranslate.Locale;
+import io.github.lee0701.mousetranslate.message.MouseMessage;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -10,6 +8,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import org.bukkit.Bukkit;
 
 import javax.security.auth.login.LoginException;
+import java.util.function.Function;
 
 public class BotInstance {
     private JDA jda;
@@ -32,31 +31,23 @@ public class BotInstance {
 
     }
 
-    public void sendDiscordMessage(TextChannel textChannel, String nickname, String message) {
-        discordMessageHandler.offerMessage(new DiscordMessage(textChannel, nickname, message));
-    }
-
-    public void sendDiscordMessages(String nickname, String messge) {
+    public void sendDiscordMessages(Function<TextChannel, MouseMessage> messageGenerator) {
         String serverId = MouseTranslate.getInstance().getServerId();
         for (String channelId : MouseTranslate.getInstance().getChannels()) {
             TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
-            sendDiscordMessage(textChannel, nickname, messge);
+            sendDiscordMessage(messageGenerator.apply(textChannel));
         }
     }
 
-    public void sendMinecraftMessage(TextChannel textChannel, String nickname, Locale fromLocale, String message) {
-        discordMessageHandler.offerMessage(new TranslatingDiscordMessage(textChannel, nickname, fromLocale, message));
-    }
-
-    public void sendMinecraftMessage(String nickname, Locale fromLocale, String message) {
-        String serverId = MouseTranslate.getInstance().getServerId();
-        for (String channelId : MouseTranslate.getInstance().getChannels()) {
-            TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
-            sendMinecraftMessage(textChannel, nickname, fromLocale, message);
-        }
+    public void sendDiscordMessage(MouseMessage message) {
+        discordMessageHandler.offerMessage(message);
     }
 
     public JDA getJda() {
         return jda;
+    }
+
+    public void dispose() {
+        jda.shutdownNow();
     }
 }

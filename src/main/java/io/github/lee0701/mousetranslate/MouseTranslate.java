@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class MouseTranslate extends JavaPlugin {
     private final File dataFile = new File(getDataFolder(), "data.yml");
-    private LegacyBotInstance bot = new LegacyBotInstance();
+    private BotInstance bot = new BotInstance();
     private String serverId;
     private List<String> channels = new ArrayList<>();
     private List<String> languages = new ArrayList<>();
@@ -75,9 +75,10 @@ public final class MouseTranslate extends JavaPlugin {
     @Override
     public void onDisable() {
         save();
+        bot.dispose();
     }
 
-    public LegacyBotInstance getBot() {
+    public BotInstance getBot() {
         return bot;
     }
 

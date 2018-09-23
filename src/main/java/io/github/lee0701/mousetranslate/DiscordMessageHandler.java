@@ -22,5 +22,4 @@ public class DiscordMessageHandler extends BukkitRunnable {
     public void offerMessage(MouseMessage message) {
         messageQueue.offer(message);
     }
-
 }

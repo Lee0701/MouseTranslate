@@ -4,6 +4,7 @@ import net.dv8tion.jda.core.entities.Icon;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.Webhook;
+import net.dv8tion.jda.webhook.WebhookClient;
 
 public class WebhookMessage extends MouseMessage {
     private final String nickname;
@@ -15,21 +16,23 @@ public class WebhookMessage extends MouseMessage {
         this.nickname = nickname;
     }
 
-    protected void setAvatar(Icon avatar) {
+    protected final void setAvatar(Icon avatar) {
         this.avatar = avatar;
     }
 
-    protected void setMessage(Message message) {
+    protected final void setMessage(Message message) {
         this.message = message;
     }
 
     @Override
-    public void send() {
+    public final void send() {
         if (message == null) {
             return;
         }
         Webhook webhook = getChannel().createWebhook(nickname).setAvatar(avatar).complete();
-        webhook.newClient().build().send(message).join();
-        webhook.delete().complete();
+        try (WebhookClient client = webhook.newClient().build()) {
+            client.send(message).join();
+            webhook.delete().complete();
+        }
     }
 }
