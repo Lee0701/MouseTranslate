@@ -83,7 +83,9 @@ public class DiscordChatListener extends ListenerAdapter {
                     .info(String.format("(%s)[%s]<%s>: %s", guild.getName(), textChannel.getName(), name, msg));
             broadcastTranslatedChat(format, minecraftName, msg);
             bot.sendDiscordMessage(
-                    new MinecraftMessage("Discord", textChannel, name, msg, null, IconStorage.getIconFor(author)));
+                    new MinecraftMessage("Discord", textChannel, name, msg, null, IconStorage.getIconFor(author),
+                            mousePlayer.isConnected()
+                    ));
             message.delete().queue();
         }
     }

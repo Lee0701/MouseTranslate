@@ -4,6 +4,7 @@ import io.github.lee0701.mousetranslate.message.MouseMessage;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.bukkit.Bukkit;
 
@@ -31,10 +32,14 @@ public class BotInstance {
 
     }
 
+    public Guild getGuild() {
+        return jda.getGuildById(MouseTranslate.getInstance().getServerId());
+    }
+
     public void sendDiscordMessages(Function<TextChannel, MouseMessage> messageGenerator) {
-        String serverId = MouseTranslate.getInstance().getServerId();
+        Guild guild = getGuild();
         for (String channelId : MouseTranslate.getInstance().getChannels()) {
-            TextChannel textChannel = jda.getGuildById(serverId).getTextChannelById(channelId);
+            TextChannel textChannel = guild.getTextChannelById(channelId);
             sendDiscordMessage(messageGenerator.apply(textChannel));
         }
     }

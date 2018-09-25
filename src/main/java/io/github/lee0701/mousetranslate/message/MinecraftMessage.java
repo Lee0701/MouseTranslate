@@ -115,7 +115,7 @@ public class MinecraftMessage extends WebhookMessage {
     }
 
     public MinecraftMessage(String side, TextChannel channel, String nickname, String message, Locale fromLocale,
-            Icon icon) {
+            Icon icon, boolean connected) {
         super(channel, nickname);
 
         Translator translator = RatTranslate.getInstance().getTranslator();
@@ -137,6 +137,8 @@ public class MinecraftMessage extends WebhookMessage {
                 })
                 .collect(Collectors.joining("\n"));
         setAvatar(icon);
-        setMessage(new MessageBuilder().setContent("[" + side + "]\n" + translatedMessage).build());
+        setMessage(
+                new MessageBuilder().setContent("[" + side + "]" + (connected ? " :link:\n" : "\n") + translatedMessage)
+                        .build());
     }
 }

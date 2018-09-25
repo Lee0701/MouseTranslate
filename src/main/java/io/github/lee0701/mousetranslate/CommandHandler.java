@@ -23,7 +23,13 @@ public class CommandHandler implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage("Usage: /mousetranslate register");
+            if (sender.isOp()) {
+                sender.sendMessage("Usage:");
+                sender.sendMessage("/" + label + " register");
+                sender.sendMessage("/" + label + " reload");
+            } else {
+                sender.sendMessage("Usage: /" + label + " register");
+            }
             return true;
         }
         if (args[0].equals("reload")) {

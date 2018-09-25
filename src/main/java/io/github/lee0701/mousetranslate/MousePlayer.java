@@ -23,15 +23,20 @@ public class MousePlayer implements ConfigurationSerializable {
 
     public static Optional<MousePlayer> of(Player player) {
         Objects.requireNonNull(player, "player");
-        return PLAYER_MAP.values()
-                .stream()
-                .filter(e -> player.getUniqueId().toString().equals(e.uuid))
-                .findFirst();
+        return PLAYER_MAP.values().stream().filter(e -> player.getUniqueId().toString().equals(e.uuid)).findFirst();
     }
 
     public static MousePlayer of(String discordId) {
         Objects.requireNonNull(discordId, "discordId");
         return PLAYER_MAP.computeIfAbsent(discordId, MousePlayer::new);
+    }
+
+    public static boolean checkConnected(Player player) {
+        return of(player).map(MousePlayer::isConnected).orElse(false);
+    }
+
+    public static boolean checkConnected(String discordId) {
+        return of(discordId).isConnected();
     }
 
     public static MousePlayer deserialize(Map<String, Object> args) {
@@ -89,6 +94,10 @@ public class MousePlayer implements ConfigurationSerializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public boolean isConnected() {
+        return discordId != null && uuid != null;
     }
 
     public String getChatFormat() {

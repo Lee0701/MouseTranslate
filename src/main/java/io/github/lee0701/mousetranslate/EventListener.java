@@ -28,7 +28,8 @@ public class EventListener implements Listener {
         RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
         bot.sendDiscordMessages(
                 channel -> new MinecraftMessage("Minecraft", channel, nickname, message, ratPlayer.getLocale(),
-                        IconStorage.getIconFor(event.getPlayer().getUniqueId())
+                        IconStorage.getIconFor(event.getPlayer().getUniqueId()),
+                        MousePlayer.checkConnected(event.getPlayer())
                 ));
     }
 
