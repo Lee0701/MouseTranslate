@@ -75,7 +75,6 @@ public final class MouseTranslate extends JavaPlugin {
     @Override
     public void onDisable() {
         save();
-        bot.dispose();
     }
 
     public BotInstance getBot() {

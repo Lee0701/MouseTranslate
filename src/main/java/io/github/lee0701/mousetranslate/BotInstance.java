@@ -51,8 +51,4 @@ public class BotInstance {
     public JDA getJda() {
         return jda;
     }
-
-    public void dispose() {
-        jda.shutdownNow();
-    }
 }
