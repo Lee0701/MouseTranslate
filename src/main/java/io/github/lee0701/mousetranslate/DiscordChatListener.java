@@ -47,8 +47,12 @@ public class DiscordChatListener extends ListenerAdapter {
         User author = event.getAuthor();
         String msg = message.getContentDisplay();
 
-        if (MousePlayer.REGISTER_MAP.containsKey(msg)) {
-            Player player = MousePlayer.REGISTER_MAP.get(msg);
+        Registration registration = MousePlayer.REGISTRATIONS.stream()
+                .filter(it -> it.isCommandMatches(msg))
+                .findFirst()
+                .orElse(null);
+        if (registration != null) {
+            Player player = registration.getPlayer();
 
             MousePlayer mousePlayer = MousePlayer.of(author.getId());
             mousePlayer.setNickname(player.getDisplayName());
@@ -56,8 +60,9 @@ public class DiscordChatListener extends ListenerAdapter {
 
             player.sendMessage("Discord register complete!");
 
-            MousePlayer.REGISTER_MAP.remove(msg);
+            MousePlayer.REGISTRATIONS.remove(registration);
             message.delete().queue();
+
             return;
         }
 

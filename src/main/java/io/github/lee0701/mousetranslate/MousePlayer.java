@@ -3,14 +3,11 @@ package io.github.lee0701.mousetranslate;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class MousePlayer implements ConfigurationSerializable {
     static final Map<String, MousePlayer> PLAYER_MAP = new HashMap<>();
-    static final Map<String, Player> REGISTER_MAP = new HashMap<>();
+    static final Set< Registration> REGISTRATIONS = new HashSet<>();
 
     private String nickname;
     private String discordId;
