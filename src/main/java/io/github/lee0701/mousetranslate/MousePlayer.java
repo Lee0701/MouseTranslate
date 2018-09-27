@@ -7,7 +7,7 @@ import java.util.*;
 
 public class MousePlayer implements ConfigurationSerializable {
     static final Map<String, MousePlayer> PLAYER_MAP = new HashMap<>();
-    static final Set< Registration> REGISTRATIONS = new HashSet<>();
+    static final Set<Registration> REGISTRATIONS = new HashSet<>();
 
     private String nickname;
     private String discordId;
