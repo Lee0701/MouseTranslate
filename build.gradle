@@ -18,15 +18,21 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
+    maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
     mavenCentral()
     jcenter()
 }
 
 dependencies {
     compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.12.2-R0.1-SNAPSHOT'
-    compile 'net.dv8tion:JDA:3.6.0_376'
+
+    compile group: 'net.dv8tion', name: 'JDA', version: '3.6.0_376'
+    compile group: 'com.github.RanolP', name: 'RatTranslate', version: 'v1.1.0'
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compileOnly fileTree(dir: 'libs', include: '*.jar')
 }
 
 processResources {
@@ -41,5 +47,5 @@ shadowJar {
 }
 
 artifacts {
-    archives jar
+    archives shadowJar
 }

@@ -1,6 +1,10 @@
 package io.github.lee0701.mousetranslate;
 
+import io.github.lee0701.mousetranslate.message.MinecraftMessage;
+import io.github.lee0701.mousetranslate.message.SimpleMessage;
 import io.github.ranolp.rattranslate.RatPlayer;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Message;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,36 +12,37 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class EventListener implements Listener {
+    private final BotInstance bot = MouseTranslate.getInstance().getBot();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        MousePlayer mousePlayer = MousePlayer.of(event.getPlayer());
-        if(mousePlayer != null) {
+        MousePlayer.of(event.getPlayer()).ifPresent(mousePlayer -> {
             mousePlayer.setChatFormat(event.getFormat());
             mousePlayer.setNickname(event.getPlayer().getDisplayName());
-        }
+        });
 
         String nickname = event.getPlayer().getName();
         String message = ChatColor.stripColor(event.getMessage());
         RatPlayer ratPlayer = RatPlayer.of(event.getPlayer());
-        MouseTranslate.getInstance().sendTranslatedMessages("[Minecraft] " + nickname, ratPlayer.getLocale(), message);
+        bot.sendDiscordMessages(
+                channel -> new MinecraftMessage("Minecraft", channel, nickname, message, ratPlayer.getLocale(),
+                        IconStorage.getIconFor(event.getPlayer().getUniqueId()),
+                        MousePlayer.checkConnected(event.getPlayer())
+                ));
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        String name = MouseTranslate.getInstance().getBotName();
-        String message = event.getPlayer().getName() + " joined.";
-        MouseTranslate.getInstance().sendDiscordMessages(name, message);
+        Message message = new MessageBuilder().setContent(event.getPlayer().getName() + " joined.").build();
+        bot.sendDiscordMessages(channel -> new SimpleMessage(channel, message));
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        String name = MouseTranslate.getInstance().getBotName();
-        String message = event.getPlayer().getName() + " quit.";
-        MouseTranslate.getInstance().sendDiscordMessages(name, message);
+        Message message = new MessageBuilder().setContent(event.getPlayer().getName() + " left.").build();
+        bot.sendDiscordMessages(channel -> new SimpleMessage(channel, message));
     }
 
 }
