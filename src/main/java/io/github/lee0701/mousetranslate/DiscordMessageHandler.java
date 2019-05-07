@@ -11,11 +11,9 @@ public class DiscordMessageHandler extends BukkitRunnable {
 
     @Override
     public void run() {
-        while (true) {
-            while (!messageQueue.isEmpty()) {
-                MouseMessage message = messageQueue.poll();
-                message.send();
-            }
+        while (!messageQueue.isEmpty()) {
+            MouseMessage message = messageQueue.poll();
+            message.send();
         }
     }
 

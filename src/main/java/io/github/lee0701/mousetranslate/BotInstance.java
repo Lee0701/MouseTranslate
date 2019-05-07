@@ -24,7 +24,7 @@ public class BotInstance {
             jda.addEventListener(new DiscordChatListener());
 
             discordMessageHandler = new DiscordMessageHandler();
-            discordMessageHandler.runTaskAsynchronously(MouseTranslate.getInstance());
+            discordMessageHandler.runTaskTimerAsynchronously(MouseTranslate.getInstance(), 0, 20);
         } catch (LoginException ex) {
             Bukkit.getLogger().warning("Error loading Discord bot.");
             ex.printStackTrace();
