@@ -32,6 +32,7 @@ public class WebhookMessage extends MouseMessage {
         Webhook webhook = getChannel().createWebhook(nickname).setAvatar(avatar).complete();
         try (WebhookClient client = webhook.newClient().build()) {
             client.send(message).join();
+        } finally {
             webhook.delete().complete();
         }
     }
