@@ -57,7 +57,7 @@ public class CommandHandler implements TabExecutor {
                 String url = "http:register/" + registration.getKey();
                 TextComponent register = new TextComponent(registerCommand);
                 register.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new BaseComponent[] {new TextComponent("or click to copy alternative command")}
+                        new BaseComponent[] {new TextComponent("or click to copy an alternative command")}
                 ));
                 register.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
                 register.setColor(ChatColor.AQUA.asBungee());
